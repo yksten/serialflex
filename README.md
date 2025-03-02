@@ -281,7 +281,7 @@ JSONDecoder& convert(const char* name, T& value, bool* has_value = NULL) {
 }
 ```
 
-### 七、黑科技
+### 七、工具
 
 #### `tool\json2cpp`是辅助工具，可以将json字符串转换为C++ class。
 *   json字符串：
