@@ -6,12 +6,12 @@
 
 namespace serialflex {
 
-namespace custom {
+namespace json {
 class Writer;
-}// namespace custom
+}// namespace json
 
 class EXPORTAPI JSONEncoder {
-    custom::Writer* writer_;
+    json::Writer* writer_;
 
 public:
     explicit JSONEncoder(std::string& str, bool formatted = false);

@@ -20,6 +20,16 @@ namespace serialflex {
 
 namespace internal {
 
+template <class T, class C> void serialize(T& t, C& c) { c.serialize(t); }
+
+template <class T, class C> void serializeWrapper(T& t, C& c) {
+    serialize(t, c);
+}
+#if __cplusplus >= 201103L
+template <typename T, bool is_enum = std::is_enum<T>::value> struct TypeTraits {
+    typedef T Type;
+};
+#else
 template <typename From, typename To> class is_convertible {
     typedef char one;
     typedef int two;
@@ -40,6 +50,18 @@ template <class T> struct isIntegral {
 template <> struct isIntegral<bool> {
     static const bool value = true;
 };
+template <> struct isIntegral<int8_t> {
+    static const bool value = true;
+};
+template <> struct isIntegral<uint8_t> {
+    static const bool value = true;
+};
+template <> struct isIntegral<int16_t> {
+    static const bool value = true;
+};
+template <> struct isIntegral<uint16_t> {
+    static const bool value = true;
+};
 template <> struct isIntegral<int32_t> {
     static const bool value = true;
 };
@@ -58,21 +80,22 @@ template <> struct isIntegral<float> {
 template <> struct isIntegral<double> {
     static const bool value = true;
 };
+template <> struct isIntegral<long> {
+    static const bool value = true;
+};
+template <> struct isIntegral<unsigned long> {
+    static const bool value = true;
+};
 
 template <class T> struct is_enum {
     static const bool value =
         is_convertible<T, int32_t>::value & !isIntegral<T>::value;
 };
 
-template <class T, class C> void serialize(T& t, C& c) { c.serialize(t); }
-
-template <class T, class C> void serializeWrapper(T& t, C& c) {
-    serialize(t, c);
-}
-
 template <typename T, bool is_enum = is_enum<T>::value> struct TypeTraits {
     typedef T Type;
 };
+#endif
 template <typename T, bool is_enum> struct TypeTraits<std::vector<T>, is_enum> {
     typedef std::vector<T> Type;
 };

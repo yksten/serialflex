@@ -20,35 +20,55 @@ ENDIF (MSVC)
 SET(INCLUDE "include/serialflex/traits.h" "include/serialflex/serialize.h")
 SOURCE_GROUP(include FILES ${INCLUDE})
 
-# third
-SET(JSON "src/json/third/reader.h" "src/json/third/reader.cpp" "src/json/third/writer.h" "src/json/third/writer.cpp")
-SOURCE_GROUP("src\\json\\third" FILES ${JSON})
-
 # json
 SET(INCLUDEJSON "include/serialflex/json/encoder.h" "include/serialflex/json/decoder.h")
 SOURCE_GROUP("include\\json" FILES ${INCLUDEJSON})
 SET(SRCJSON "src/json/encoder.cpp" "src/json/decoder.cpp")
 SOURCE_GROUP("src\\json" FILES ${SRCJSON})
 
+# third
+SET(JSON "src/json/reader.h" "src/json/reader.cpp" "src/json/writer.h" "src/json/writer.cpp")
+SOURCE_GROUP("src\\json" FILES ${JSON})
+
+# xml
+SET(INCLUDEXML "include/serialflex/xml/encoder.h" "include/serialflex/xml/decoder.h")
+SOURCE_GROUP("include\\xml" FILES ${INCLUDEXML})
+SET(SRCXML "src/xml/encoder.cpp" "src/xml/decoder.cpp")
+SOURCE_GROUP("src\\xml" FILES ${SRCXML})
+
+# third
+SET(XML "src/xml/reader.h" "src/xml/reader.cpp" "src/xml/writer.h" "src/xml/writer.cpp")
+SOURCE_GROUP("src\\xml" FILES ${XML})
+
+# node
+SET(NODE "src/node.h")
+SOURCE_GROUP("src" FILES ${NODE})
+
 IF (MSVC)
     ADD_LIBRARY(${PROJECT_NAME} SHARED
-    ${JSON} 
-    ${INCLUDE} 
+    ${INCLUDE}
+    ${JSON}
     ${INCLUDEJSON} ${SRCJSON}
+    ${XML}
+    ${INCLUDEXML} ${SRCXML}
+    ${NODE}
     )
 ELSE ()
     ADD_LIBRARY(${PROJECT_NAME} 
-    ${JSON} 
-    ${INCLUDE} 
+    ${INCLUDE}
+    ${JSON}
     ${INCLUDEJSON} ${SRCJSON}
+    ${XML}
+    ${INCLUDEXML} ${SRCXML}
+    ${NODE}
     )
     TARGET_COMPILE_OPTIONS(${PROJECT_NAME} PRIVATE -Wno-deprecated-declarations)
 ENDIF (MSVC)
 
 
-SET(EXAMPLE OFF CACHE BOOL "")
+SET(EXAMPLE ON CACHE BOOL "")
 if (${EXAMPLE} STREQUAL ON)
-    SET(EXAMPLE "example/main.cpp" "example/exampledata.h")
+    SET(EXAMPLE "example/main.cpp")
     SOURCE_GROUP(example FILES ${EXAMPLE})
     ADD_EXECUTABLE(example ${EXAMPLE})
     TARGET_LINK_LIBRARIES(example ${PROJECT_NAME})

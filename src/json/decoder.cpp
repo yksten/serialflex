@@ -1,4 +1,4 @@
-#include <json/third/reader.h>
+#include <json/reader.h>
 #include <serialflex/json/decoder.h>
 
 namespace serialflex {
@@ -121,7 +121,7 @@ static bool parse_string(std::string& strValue, const char* str,
 JSONDecoder::JSONDecoder(const char* str, bool caseInsensitive)
     : convert_by_type_(true), case_insensitive_(caseInsensitive),
       current_(NULL) {
-    reader_ = new custom::Reader();
+    reader_ = new json::Reader();
     current_ = reader_->parse(str);
     assert(current_);
 }
@@ -134,9 +134,9 @@ JSONDecoder& JSONDecoder::setConvertByType(bool convert_by_type) {
 }
 
 void JSONDecoder::decodeValue(const char* name, bool& value, bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_BOOL)) {
+    if (item && checkItemType(*item, json::VALUE_BOOL)) {
         value = item2Bool(*item);
         if (has_value) {
             *has_value = true;
@@ -146,10 +146,10 @@ void JSONDecoder::decodeValue(const char* name, bool& value, bool* has_value) {
 
 void JSONDecoder::decodeValue(const char* name, uint32_t& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
-        value = (uint32_t)custom::Reader::convertUint(item->value,
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
+        value = (uint32_t)json::Reader::convertUint(item->value,
                                                       item->value_size);
         if (has_value) {
             *has_value = true;
@@ -159,11 +159,11 @@ void JSONDecoder::decodeValue(const char* name, uint32_t& value,
 
 void JSONDecoder::decodeValue(const char* name, int32_t& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
         value =
-            (int32_t)custom::Reader::convertInt(item->value, item->value_size);
+            (int32_t)json::Reader::convertInt(item->value, item->value_size);
         if (has_value) {
             *has_value = true;
         }
@@ -172,10 +172,10 @@ void JSONDecoder::decodeValue(const char* name, int32_t& value,
 
 void JSONDecoder::decodeValue(const char* name, uint64_t& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
-        value = custom::Reader::convertUint(item->value, item->value_size);
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
+        value = json::Reader::convertUint(item->value, item->value_size);
         if (has_value) {
             *has_value = true;
         }
@@ -184,10 +184,10 @@ void JSONDecoder::decodeValue(const char* name, uint64_t& value,
 
 void JSONDecoder::decodeValue(const char* name, int64_t& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
-        value = custom::Reader::convertInt(item->value, item->value_size);
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
+        value = json::Reader::convertInt(item->value, item->value_size);
         if (has_value) {
             *has_value = true;
         }
@@ -195,11 +195,11 @@ void JSONDecoder::decodeValue(const char* name, int64_t& value,
 }
 
 void JSONDecoder::decodeValue(const char* name, float& value, bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
         value =
-            (float)custom::Reader::convertDouble(item->value, item->value_size);
+            (float)json::Reader::convertDouble(item->value, item->value_size);
         if (has_value) {
             *has_value = true;
         }
@@ -208,10 +208,10 @@ void JSONDecoder::decodeValue(const char* name, float& value, bool* has_value) {
 
 void JSONDecoder::decodeValue(const char* name, double& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_NUMBER)) {
-        value = custom::Reader::convertDouble(item->value, item->value_size);
+    if (item && checkItemType(*item, json::VALUE_NUMBER)) {
+        value = json::Reader::convertDouble(item->value, item->value_size);
         if (has_value) {
             *has_value = true;
         }
@@ -220,9 +220,9 @@ void JSONDecoder::decodeValue(const char* name, double& value,
 
 void JSONDecoder::decodeValue(const char* name, std::string& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_STRING) &&
+    if (item && checkItemType(*item, json::VALUE_STRING) &&
         item->value && item->value_size) {
         value.clear();
         bool result = parse_string(value, item->value, item->value_size);
@@ -235,11 +235,11 @@ void JSONDecoder::decodeValue(const char* name, std::string& value,
 
 void JSONDecoder::decodeValue(const char* name, std::vector<bool>& value,
                               bool* has_value) {
-    const custom::GenericValue* item =
+    const GenericNode* item =
         JSONDecoder::getObjectItem(current_, name, case_insensitive_);
-    if (item && checkItemType(*item, custom::GenericValue::VALUE_ARRAY)) {
-        for (const custom::GenericValue* child = item->child;
-             child && checkItemType(*item, custom::GenericValue::VALUE_BOOL);
+    if (item && checkItemType(*item, json::VALUE_ARRAY)) {
+        for (const GenericNode* child = item->child;
+             child && checkItemType(*item, json::VALUE_BOOL);
              child = child->next) {
             value.push_back(item2Bool(*child));
             if (has_value) {
@@ -249,23 +249,23 @@ void JSONDecoder::decodeValue(const char* name, std::vector<bool>& value,
     }
 }
 
-bool JSONDecoder::checkItemType(const custom::GenericValue& item,
+bool JSONDecoder::checkItemType(const GenericNode& item,
                                 const int type) const {
-    if (!convert_by_type_ && item.type != custom::GenericValue::VALUE_NULL) {
+    if (!convert_by_type_ && item.type != json::VALUE_NULL) {
         return true;
     }
     return (item.type == type);
 }
 
-bool JSONDecoder::item2Bool(const custom::GenericValue& item) const {
-    if (item.type == custom::GenericValue::VALUE_BOOL) {
+bool JSONDecoder::item2Bool(const GenericNode& item) const {
+    if (item.type == json::VALUE_BOOL) {
         return (item.value_size == 4);
     } else if (!convert_by_type_) {
-        if (item.type == custom::GenericValue::VALUE_NUMBER) {
+        if (item.type == json::VALUE_NUMBER) {
             int64_t value =
-                custom::Reader::convertInt(item.value, item.value_size);
+                json::Reader::convertInt(item.value, item.value_size);
             return (value != 0);
-        } else if (item.type == custom::GenericValue::VALUE_STRING) {
+        } else if (item.type == json::VALUE_STRING) {
             std::string value;
             if (parse_string(value, item.value, item.value_size)) {
                 return (atoi(value.c_str()));
@@ -277,10 +277,10 @@ bool JSONDecoder::item2Bool(const custom::GenericValue& item) const {
     return false;
 }
 
-uint32_t JSONDecoder::getObjectSize(const custom::GenericValue* parent) {
+uint32_t JSONDecoder::getObjectSize(const GenericNode* parent) {
     uint32_t size = 0;
     if (parent) {
-        for (const custom::GenericValue* child = parent->child; child;
+        for (const GenericNode* child = parent->child; child;
              child = child->next) {
             ++size;
         }
@@ -297,14 +297,14 @@ static int32_t strcasecmp(const char* s1, const char* s2) {
            tolower(*(const unsigned char*)s2);
 }
 
-const custom::GenericValue*
-JSONDecoder::getObjectItem(const custom::GenericValue* parent, const char* name,
+const GenericNode*
+JSONDecoder::getObjectItem(const GenericNode* parent, const char* name,
                            bool caseInsensitive) {
     if (!parent || !name) {
         return parent;
     }
 
-    for (custom::GenericValue* child = parent->child; child;
+    for (GenericNode* child = parent->child; child;
          child = child->next) {
         if (child->key && (strlen(name) == child->key_size)) {
             if (!caseInsensitive) {
@@ -323,30 +323,30 @@ JSONDecoder::getObjectItem(const custom::GenericValue* parent, const char* name,
     return NULL;
 }
 
-const custom::GenericValue*
-JSONDecoder::getChild(const custom::GenericValue* parent) {
+const GenericNode*
+JSONDecoder::getChild(const GenericNode* parent) {
     if (parent) {
         return parent->child;
     }
     return NULL;
 }
 
-const custom::GenericValue*
-JSONDecoder::getNext(const custom::GenericValue* parent) {
+const GenericNode*
+JSONDecoder::getNext(const GenericNode* parent) {
     if (parent) {
         return parent->next;
     }
     return NULL;
 }
 
-const char* JSONDecoder::getKey(const custom::GenericValue* parent) {
+const char* JSONDecoder::getKey(const GenericNode* parent) {
     if (parent) {
         return parent->key;
     }
     return NULL;
 }
 
-uint32_t JSONDecoder::getKeySize(const custom::GenericValue* parent) {
+uint32_t JSONDecoder::getKeySize(const GenericNode* parent) {
     if (parent) {
         return parent->key_size;
     }

@@ -1,10 +1,10 @@
-#include <json/third/writer.h>
+#include <json/writer.h>
 #include <serialflex/json/encoder.h>
 
 namespace serialflex {
 
 JSONEncoder::JSONEncoder(std::string& str, bool formatted) {
-    writer_ = new custom::Writer(str, formatted);
+    writer_ = new json::Writer(str, formatted);
 }
 
 JSONEncoder::~JSONEncoder() { delete writer_; }
