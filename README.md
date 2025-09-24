@@ -1,8 +1,8 @@
 # serialflex
 ### 一、简介
-C++98序列化库，C++类与JSON快速超高效互转库。快速、简洁的 API 设计，大大降低直接使用JSON解析库来实现此类功能的代码复杂度。也没有外部依赖。  
+C++98序列化库，C++类与JSON、XML、Google protobuf等快速超高效互转库。快速、简洁的 API 设计，大大降低直接使用JSON、XML、Google protobuf解析库来实现此类功能的代码复杂度。也没有外部依赖。  
 
-***注：*** 该库旨在C++和json互转（后续可能会支持xml、protobuf）。 
+***注：*** 该库旨在以C++ Class为核心，和json、xml、protobuf等协议的互转。 
 
 支持结构体类型：
 * 支持`bool`、`uint32_t`、`int32_t`、`uint64_t`、`int64_t`、`float`、`double`、`enum`、`std::string`、`std::vector`和`std::map`等。（不支持`std::list`）
@@ -12,7 +12,7 @@ C++98序列化库，C++类与JSON快速超高效互转库。快速、简洁的 A
 * 解析时支持has功能。
 
 
-### 二、性能(benchmark)
+### 二、性能(benchmark测试json)
 ```
 -------------------------------------------------------------
 Benchmark                   Time             CPU   Iterations

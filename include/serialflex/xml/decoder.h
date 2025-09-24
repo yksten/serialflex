@@ -3,6 +3,7 @@
 
 #include <map>
 #include <serialflex/traits.h>
+#include <serialflex/field.h>
 
 namespace serialflex {
 
@@ -27,21 +28,30 @@ public:
     // convert by field type
     XMLDecoder& setConvertByType(bool convert_by_type);
 
-    template <typename T> XMLDecoder& convert(const char* name, T& value, bool* has_value = NULL) {
+    template <typename T>
+    XMLDecoder& operator&(const Field<T>& field) {
+        Field<T>& remove_const_field = *const_cast<Field<T>*>(&field);
+        return convert(field.getName(), remove_const_field.value(), remove_const_field.has());
+    }
+
+    template <typename T>
+    XMLDecoder& convert(const char* name, T& value, bool* has_value = NULL) {
         decodeValue(name, *(typename internal::TypeTraits<T>::Type*)(&value), has_value);
         return *this;
     }
 
-    template <typename T> bool operator>>(T& value) {
+    template <typename T>
+    bool operator>>(T& value) {
         if (!current_) {
             return false;
         }
         const GenericNode* parent = current_;
-        internal::serializeWrapper(*this, *const_cast<T*>(&value));
+        internal::serializeWrapper(*this, value);
         return (parent == current_);
     }
 
-    template <typename T> bool operator>>(std::vector<T>& value) {
+    template <typename T>
+    bool operator>>(std::vector<T>& value) {
         if (!current_) {
             return false;
         }
@@ -61,7 +71,8 @@ public:
         return (parent == current_);
     }
 
-    template <typename K, typename V> bool operator>>(std::map<K, V>& value) {
+    template <typename K, typename V>
+    bool operator>>(std::map<K, V>& value) {
         if (!current_) {
             return false;
         }
@@ -72,8 +83,8 @@ public:
              child = XMLDecoder::getNext(child)) {
             K key = K();
             V item = V();
-            decodeValue("key", key, NULL);
-            decodeValue("value", item, NULL);
+            decodeValue("key", *(typename internal::TypeTraits<K>::Type*)(&key), NULL);
+            decodeValue("value", *(typename internal::TypeTraits<V>::Type*)(&item), NULL);
             value.insert(std::pair<K, V>(key, item));
         }
         current_ = parent_temp;
@@ -81,7 +92,8 @@ public:
     }
 
 private:
-    template <typename T> void decodeValue(const char* name, T& value, bool* has_value) {
+    template <typename T>
+    void decodeValue(const char* name, T& value, bool* has_value) {
         const GenericNode* parent = current_;
         current_ = XMLDecoder::getObjectItem(current_, name, case_insensitive_);
         if (current_) {
@@ -127,8 +139,8 @@ private:
                  current_ = XMLDecoder::getNext(current_)) {
                 K key = K();
                 V item = V();
-                decodeValue("key", key, NULL);
-                decodeValue("value", item, NULL);
+                decodeValue("key", *(typename internal::TypeTraits<K>::Type*)(&key), NULL);
+                decodeValue("value", *(typename internal::TypeTraits<V>::Type*)(&item), NULL);
                 value.insert(std::pair<K, V>(key, item));
             }
             current_ = parent_temp;
@@ -153,7 +165,7 @@ private:
     // for value
     static uint32_t getObjectSize(const GenericNode* parent);
     static const GenericNode* getObjectItem(const GenericNode* parent, const char* name,
-                                                  bool caseInsensitive);
+                                            bool caseInsensitive);
     static const GenericNode* getChild(const GenericNode* parent);
     static const GenericNode* getNext(const GenericNode* parent);
 

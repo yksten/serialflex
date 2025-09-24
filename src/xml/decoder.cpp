@@ -10,7 +10,11 @@ XMLDecoder::XMLDecoder(const char* str, bool case_insensitive)
     assert(current_);
 }
 
-XMLDecoder::~XMLDecoder() { delete reader_; }
+XMLDecoder::~XMLDecoder() {
+    if (reader_) {
+        delete reader_;
+    }
+}
 
 XMLDecoder& XMLDecoder::setConvertByType(bool convert_by_type) {
     convert_by_type_ = convert_by_type;

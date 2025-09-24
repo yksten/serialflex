@@ -28,7 +28,7 @@ enum {
 class Reader {
     GenericNode* cur_value_;
     std::vector<GenericNode> values_;
-    GenericValueAllocator<GenericNode> alloc_;
+    GenericNodeAllocator<GenericNode> alloc_;
     std::string str_error_;
 
 public:

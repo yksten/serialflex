@@ -3,6 +3,7 @@
 
 #include <map>
 #include <serialflex/traits.h>
+#include <serialflex/field.h>
 
 namespace serialflex {
 
@@ -18,30 +19,36 @@ public:
     ~JSONEncoder();
 
     template <typename T>
-    JSONEncoder& convert(const char* name, const T& value,
-                         bool* has_value = NULL) {
+    JSONEncoder& operator&(const Field<T>& field) {
+        return convert(field.getName(), field.getValue(), field.has());
+    }
+
+    template <typename T>
+    JSONEncoder& convert(const char* name, const T& value, const bool* has_value = NULL) {
         if (!has_value || (*has_value == true)) {
-            encodeValue(
-                name, *(const typename internal::TypeTraits<T>::Type*)(&value));
+            int a = internal::TypeTraits<T>::a;
+            encodeValue(name, *(const typename internal::TypeTraits<T>::Type*)(&value));
         }
         return *this;
     }
 
-    template <typename T> bool operator<<(const T& value) {
+    template <typename T>
+    bool operator<<(const T& value) {
         startObject(NULL);
+        const typename internal::TypeTraits<T>::Type& tratis_value =
+            *(const typename internal::TypeTraits<T>::Type*)&value;
         internal::serializeWrapper(
-            *this, *const_cast<typename internal::TypeTraits<T>::Type*>(
-                       (const typename internal::TypeTraits<T>::Type*)&value));
+            *this, *const_cast<typename internal::TypeTraits<T>::Type*>(&tratis_value));
         endObject();
         return writerResult();
     }
 
-    template <typename T> bool operator<<(const std::vector<T>& value) {
+    template <typename T>
+    bool operator<<(const std::vector<T>& value) {
         startArray(NULL);
         int32_t size = (int32_t)value.size();
         for (int32_t i = 0; i < size; ++i) {
-            const typename internal::TypeTraits<T>::Type& item = value.at(i);
-            encodeValue(NULL, item);
+            encodeValue(NULL, *(const typename internal::TypeTraits<T>::Type*)(&value.at(i)));
         }
         endArray();
         return writerResult();
@@ -50,28 +57,25 @@ public:
     template <typename K, typename V>
     bool operator<<(const std::map<K, V>& value) {
         startObject(NULL);
-        for (typename std::map<K, V>::const_iterator it = value.begin();
-             it != value.end(); ++it) {
-            typename internal::TypeTraits<K>::Type* pKey =
-                const_cast<typename internal::TypeTraits<K>::Type*>(
-                    &(it->first));
-            typename internal::TypeTraits<V>::Type* pValue =
-                const_cast<typename internal::TypeTraits<V>::Type*>(
-                    &(it->second));
-            convert(internal::STOT::type<
-                        typename internal::TypeTraits<K>::Type>::tostr(*pKey),
-                    *pValue);
+        for (typename std::map<K, V>::const_iterator it = value.begin(); it != value.end(); ++it) {
+            const typename internal::TypeTraits<K>::Type& key =
+                *(const typename internal::TypeTraits<K>::Type*)(&it->first);
+            const typename internal::TypeTraits<V>::Type& item =
+                *(const typename internal::TypeTraits<V>::Type*)(&it->second);
+            convert(internal::STOT::type<K>::tostr(key).c_str(), item);
         }
         endObject();
         return writerResult();
     }
 
 private:
-    template <typename T> void encodeValue(const char* name, const T& value) {
+    template <typename T>
+    void encodeValue(const char* name, const T& value) {
         startObject(name);
+        const typename internal::TypeTraits<T>::Type& tratis_value =
+            *(const typename internal::TypeTraits<T>::Type*)&value;
         internal::serializeWrapper(
-            *this, *const_cast<typename internal::TypeTraits<T>::Type*>((
-                       const typename internal::TypeTraits<T>::Type*)(&value)));
+            *this, *const_cast<typename internal::TypeTraits<T>::Type*>(&tratis_value));
         endObject();
     }
 
@@ -80,11 +84,10 @@ private:
         startArray(name);
         int32_t size = (int32_t)value.size();
         for (int32_t i = 0; i < size; ++i) {
-            const typename internal::TypeTraits<T>::Type& item = value.at(i);
             if (i) {
                 writerSeparation();
             }
-            encodeValue(NULL, item);
+            encodeValue(NULL, *(const typename internal::TypeTraits<T>::Type*)(&value.at(i)));
         }
         endArray();
     }
@@ -92,10 +95,12 @@ private:
     template <typename K, typename V>
     void encodeValue(const char* name, const std::map<K, V>& value) {
         startObject(name);
-        for (typename std::map<K, V>::const_iterator it = value.begin();
-             it != value.end(); ++it) {
-            const V& item = it->second;
-            convert(internal::STOT::type<K>::tostr(it->first).c_str(), item);
+        for (typename std::map<K, V>::const_iterator it = value.begin(); it != value.end(); ++it) {
+            const typename internal::TypeTraits<K>::Type& key =
+                *(const typename internal::TypeTraits<K>::Type*)(&it->first);
+            const typename internal::TypeTraits<V>::Type& item =
+                *(const typename internal::TypeTraits<V>::Type*)(&it->second);
+            convert(internal::STOT::type<K>::tostr(key).c_str(), item);
         }
         endObject();
     }

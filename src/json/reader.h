@@ -24,14 +24,14 @@ class StringStream;
 class Reader {
     GenericNode* cur_value_;
     std::vector<GenericNode> values_;
-    GenericValueAllocator<GenericNode> alloc_;
+    GenericNodeAllocator<GenericNode> alloc_;
     std::string str_error_;
 
 public:
     Reader();
     ~Reader();
     const GenericNode* parse(const char* src);
-    const char* getError() const { return str_error_.c_str(); }
+    const char* getError() const;
 
     static int64_t convertInt(const char* value, uint32_t length);
     static uint64_t convertUint(const char* value, uint32_t length);

@@ -8,6 +8,9 @@
 #include <serialflex/xml/encoder.h>
 #include <serialflex/xml/decoder.h>
 
+#include <serialflex/protobuf/encoder.h>
+#include <serialflex/protobuf/decoder.h>
+
 
 enum EnumType {
     ET1 = 1,
@@ -28,8 +31,10 @@ public:
     const std::vector<EnumType>& get_ve() const {
         return ve;
     }
-    template <typename T> void serialize(T& t) {
-        t.convert("ve", ve, &has_ve);
+    template<class Archive>
+    void serialize(Archive& archive) {
+        // t.convert("ve", ve, &has_ve);
+        archive & MAKE_FIELD("ve", 1, serialflex::protobuf::FIELDTYPE_ENUM, ve, &has_ve);
     }
 };
 
@@ -39,9 +44,8 @@ struct Item {
     double price;
     int quantity;
 
-    // Cereal 序列化函数
     template<class Archive>
-    void serialize(Archive & archive) {
+    void serialize(Archive& archive) {
         archive.convert("name", name).convert("price", price).convert("quantity", quantity);
     }
 };
@@ -62,31 +66,39 @@ struct Inventory {
 };
 
 int main(int argc, char* argv[]) {
-//    data d;
-//    std::vector<EnumType> v;
-//    v.push_back(ET1);
-//    v.push_back(ET3);
-//    v.push_back(ET1);
-//    d.set_ve(v);
-//    
-//
-//    std::string str_json;
-//    bool encode_status = serialflex::JSONEncoder(str_json) << d;
-//    assert(encode_status);
-//    std::cout << "json is :" << str_json.c_str() << std::endl;
-//    
-//    data d2;
-//    bool decode_status = serialflex::JSONDecoder(str_json.c_str()) >> d2;
-//    
-//    
-//    std::string str_xml;
-//    bool encode_xml_status = serialflex::XMLEncoder(str_xml) << d;
-//    assert(encode_status);
-//    std::cout << "xml is :" << str_xml.c_str() << std::endl;
+    data d, pb_d;
+    std::vector<EnumType> v;
+    v.push_back(ET1);
+    v.push_back(ET3);
+    v.push_back(ET1);
+    d.set_ve(v);
+    std::string str_pb;
+    bool encode_status_pb = serialflex::ProtobufEncoder(str_pb) << d;
+    assert(encode_status_pb);
+    bool decode_status_pb = serialflex::ProtobufDecoder((const uint8_t*)str_pb.data(), (uint32_t)str_pb.size()) >> pb_d;
+    assert(decode_status_pb);
+
+    
+    std::string str_json;
+    bool encode_status_json = serialflex::JSONEncoder(str_json) << d;
+    assert(encode_status_json);
+    std::cout << "json is :" << str_json.c_str() << std::endl;
+    data d_json;
+    bool decode_status_json = serialflex::JSONDecoder(str_json.c_str()) >> d_json;
+    assert(decode_status_json);
+    
+    
+    std::string str_xml;
+    bool encode_xml_status = serialflex::XMLEncoder(str_xml) << d;
+    assert(encode_xml_status);
+    std::cout << "xml is :" << str_xml.c_str() << std::endl;
+    data d_xml;
+    bool decode_status_xml = serialflex::XMLDecoder(str_xml.c_str()) >> d_xml;
+    assert(decode_status_xml);
     
     
     
-    // 创建并填充我们要序列化的数据
+
     Inventory myInventory, my_inventory;
     myInventory.shopId = 9001;
     myInventory.shopName = "Cereal Supermart";

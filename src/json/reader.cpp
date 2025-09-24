@@ -115,6 +115,13 @@ const GenericNode* Reader::parse(const char* src) {
     return root;
 }
 
+const char* Reader::getError() const {
+    if (str_error_.empty()) {
+        return NULL;
+    }
+    return str_error_.c_str();
+}
+
 void Reader::parseValue(StringStream& is) {
     switch (is.Peek()) {
         case 'n':
