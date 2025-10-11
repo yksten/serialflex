@@ -1,14 +1,13 @@
 #ifndef __GENERIC_READER_H__
 #define __GENERIC_READER_H__
 
-#include <stdio.h>
-#include <stdint.h>
-#include <ctype.h>
-#include <cstdlib>
-#include <string>
 #include <cassert>
+#include <cstdlib>
+#include <ctype.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string>
 #include <vector>
-
 
 namespace custom {
 
@@ -35,8 +34,8 @@ struct GenericValue {
     struct GenericValue* child;
 
     GenericValue()
-        : type(VALUE_NULL), key(NULL), key_size(0), value(NULL), value_size(0),
-          prev(NULL), next(NULL), child(NULL) {}
+        : type(VALUE_NULL), key(NULL), key_size(0), value(NULL), value_size(0), prev(NULL),
+          next(NULL), child(NULL) {}
 };
 
 class StringStream;
@@ -89,8 +88,7 @@ private:
     void setItemType(const int32_t type);
     void getChildItem(const uint32_t element_index);
     void setItemKey(const char* key, const uint32_t key_size);
-    void setItemValue(const int32_t type, const char* value,
-                      const uint32_t value_size);
+    void setItemValue(const int32_t type, const char* value, const uint32_t value_size);
 
     static bool consume(StringStream& is, const char expect);
     static void skipWhitespace(StringStream& is);

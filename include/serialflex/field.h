@@ -1,7 +1,7 @@
 #ifndef __PROTOBUF_FIELD_H__
 #define __PROTOBUF_FIELD_H__
-#include <cstdint>
 #include <cassert>
+#include <cstdint>
 
 namespace serialflex {
 namespace protobuf {
@@ -39,13 +39,15 @@ enum FieldType {
 };
 
 inline WireType fieldType2WireType(const FieldType field_type) {
-    if (field_type == FIELDTYPE_DOUBLE || field_type == FIELDTYPE_FIXED64 || field_type == FIELDTYPE_SFIXED64) {
+    if (field_type == FIELDTYPE_DOUBLE || field_type == FIELDTYPE_FIXED64 ||
+        field_type == FIELDTYPE_SFIXED64) {
         return WIRETYPE_FIXED64;
     } else if (field_type == FIELDTYPE_FLOAT || field_type == FIELDTYPE_FIXED32 ||
                field_type == FIELDTYPE_SFIXED32) {
         return WIRETYPE_FIXED32;
-    } else if (field_type == FIELDTYPE_INT64 || field_type == FIELDTYPE_UINT64 || field_type == FIELDTYPE_INT32 ||
-               field_type == FIELDTYPE_BOOL || field_type == FIELDTYPE_UINT32 || field_type == FIELDTYPE_ENUM ||
+    } else if (field_type == FIELDTYPE_INT64 || field_type == FIELDTYPE_UINT64 ||
+               field_type == FIELDTYPE_INT32 || field_type == FIELDTYPE_BOOL ||
+               field_type == FIELDTYPE_UINT32 || field_type == FIELDTYPE_ENUM ||
                field_type == FIELDTYPE_SINT32 || field_type == FIELDTYPE_SINT64) {
         return WIRETYPE_VARINT;
     } else if (field_type == FIELDTYPE_STRING || field_type == FIELDTYPE_MESSAGE ||
@@ -66,14 +68,16 @@ class Field {
     const protobuf::FieldType type_;
     T& value_;
     bool* has_;
-    const bool packed_;    // for repeated
+    const bool packed_;              // for repeated
     const protobuf::FieldType type2_;// for map
 
     Field();
     Field& operator=(const Field&);
+
 public:
-    Field(const char* name, const uint32_t number, const protobuf::FieldType type, T& value, bool* has,
-          const bool packed = false, const protobuf::FieldType type2 = protobuf::FIELDTYPE_NONE)
+    Field(const char* name, const uint32_t number, const protobuf::FieldType type, T& value,
+          bool* has, const bool packed = false,
+          const protobuf::FieldType type2 = protobuf::FIELDTYPE_NONE)
         : name_(name), number_(number), type_(type), value_(value), has_(has), packed_(packed),
           type2_(type2) {}
 
@@ -84,13 +88,22 @@ public:
     const T& getValue() const { return value_; }
     const bool* has() const { return has_; }
     bool* has() { return has_; }
-    bool getHas() const { if (!has_) { return true; } return *has_; }
-    void setHas(const bool has) { if (has_) { *has_ = has; } }
-    protobuf::WireType getWireType() const { return fieldType2WireType(type_);}
+    bool getHas() const {
+        if (!has_) {
+            return true;
+        }
+        return *has_;
+    }
+    void setHas(const bool has) {
+        if (has_) {
+            *has_ = has;
+        }
+    }
+    protobuf::WireType getWireType() const { return fieldType2WireType(type_); }
 
     bool getPacked() const { return packed_; }
     protobuf::FieldType getType2() const { return type2_; }
-    protobuf::WireType getWireType2() const { return fieldType2WireType(type2_);}
+    protobuf::WireType getWireType2() const { return fieldType2WireType(type2_); }
 };
 
 // name、value

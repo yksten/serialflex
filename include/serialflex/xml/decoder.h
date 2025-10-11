@@ -2,8 +2,8 @@
 #define __XML_DECODER_H__
 
 #include <map>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
+#include <serialflex/traits.h>
 
 namespace serialflex {
 
@@ -62,6 +62,7 @@ public:
         // }
         const GenericNode* parent_temp = current_;
         current_ = XMLDecoder::getChild(current_);
+        value.clear();
         for (uint32_t idx = 0; current_; (current_ = XMLDecoder::getNext(current_)) && ++idx) {
             T item = T();
             decodeValue("value", *(typename internal::TypeTraits<T>::Type*)(&item), NULL);
@@ -108,6 +109,7 @@ private:
         const GenericNode* parent = current_;
         current_ = XMLDecoder::getObjectItem(current_, name, case_insensitive_);
         if (current_) {
+            value.clear();
             // uint32_t size = XMLDecoder::getObjectSize(current_);
             // if (size) {
             //     value.resize(size);

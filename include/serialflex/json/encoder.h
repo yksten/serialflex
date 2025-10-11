@@ -2,8 +2,8 @@
 #define __JSON_ENCODER_H__
 
 #include <map>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
+#include <serialflex/traits.h>
 
 namespace serialflex {
 
@@ -45,6 +45,9 @@ public:
 
     template <typename T>
     bool operator<<(const std::vector<T>& value) {
+        if (value.empty()) {
+            return false;
+        }
         startArray(NULL);
         int32_t size = (int32_t)value.size();
         for (int32_t i = 0; i < size; ++i) {
@@ -56,6 +59,9 @@ public:
 
     template <typename K, typename V>
     bool operator<<(const std::map<K, V>& value) {
+        if (value.empty()) {
+            return false;
+        }
         startObject(NULL);
         for (typename std::map<K, V>::const_iterator it = value.begin(); it != value.end(); ++it) {
             const typename internal::TypeTraits<K>::Type& key =

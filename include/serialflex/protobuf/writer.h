@@ -1,9 +1,9 @@
 #ifndef __PROTOBUF_WRITER_H__
 #define __PROTOBUF_WRITER_H__
 #include <map>
-#include <string>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
+#include <serialflex/traits.h>
+#include <string>
 
 namespace serialflex {
 
@@ -51,10 +51,11 @@ private:
         const FieldType field_type = field.getType();
         size_ += varintSize((field.getNumber() << 3) | field.getWireType());// tag
         const uint64_t length = valueSize(field.getValue(), field_type);
-        if (field_type == FIELDTYPE_STRING || field_type == FIELDTYPE_MESSAGE || field_type == FIELDTYPE_BYTES) {
-            size_ += varintSize(length);                                    // length
+        if (field_type == FIELDTYPE_STRING || field_type == FIELDTYPE_MESSAGE ||
+            field_type == FIELDTYPE_BYTES) {
+            size_ += varintSize(length);// length
         }
-        size_ += length;                                                    // value
+        size_ += length;                // value
     }
 
     template <typename T>
@@ -107,7 +108,7 @@ private:
         const FieldType field_type2 = field.getType2();
         for (typename std::map<K, V>::const_iterator it = value.begin(); it != value.end(); ++it) {
             size_ += varintSize((field_number << 3) | WIRETYPE_LENGTH_DELIMITED);// tag
-            
+
             const typename internal::TypeTraits<K>::Type& first = it->first;
             const typename internal::TypeTraits<V>::Type& second = it->second;
             uint64_t length = 0;

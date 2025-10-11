@@ -154,8 +154,8 @@ static int32_t strcasecmp(const char* s1, const char* s2) {
     return tolower(*(const unsigned char*)s1) - tolower(*(const unsigned char*)s2);
 }
 
-const GenericNode* XMLDecoder::getObjectItem(const GenericNode* parent,
-                                                   const char* name, bool caseInsensitive) {
+const GenericNode* XMLDecoder::getObjectItem(const GenericNode* parent, const char* name,
+                                             bool caseInsensitive) {
     if (!parent || !name) {
         return parent;
     }

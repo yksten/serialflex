@@ -13,7 +13,8 @@ void ProtobufEncoder::writeField(const Field<std::string>& field) {
 }
 
 void ProtobufEncoder::writeValue(const int32_t& value, const protobuf::FieldType field_type) {
-    if (field_type == protobuf::FIELDTYPE_INT32 || field_type == protobuf::FIELDTYPE_BOOL || field_type == protobuf::FIELDTYPE_ENUM) {
+    if (field_type == protobuf::FIELDTYPE_INT32 || field_type == protobuf::FIELDTYPE_BOOL ||
+        field_type == protobuf::FIELDTYPE_ENUM) {
         writeVarint((uint32_t)value);
     } else if (field_type == protobuf::FIELDTYPE_SFIXED32) {
         writeFixed32(*reinterpret_cast<const uint32_t*>(&value));
@@ -40,7 +41,7 @@ void ProtobufEncoder::writeValue(const uint32_t& value, const protobuf::FieldTyp
     if (field_type == protobuf::FIELDTYPE_UINT32) {
         return writeVarint(value);
     } else if (field_type == protobuf::FIELDTYPE_FIXED32) {
-         writeFixed32(value);
+        writeFixed32(value);
     } else {
         assert(false);
         return;
@@ -51,7 +52,7 @@ void ProtobufEncoder::writeValue(const uint64_t& value, const protobuf::FieldTyp
     if (field_type == protobuf::FIELDTYPE_UINT64) {
         return writeVarint(value);
     } else if (field_type == protobuf::FIELDTYPE_FIXED64) {
-         writeFixed64(value);
+        writeFixed64(value);
     } else {
         assert(false);
         return;

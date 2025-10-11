@@ -1,9 +1,9 @@
-#include <serialflex/protobuf/decoder.h>
 #include <protobuf/reader.h>
+#include <serialflex/protobuf/decoder.h>
 
 namespace serialflex {
 
-ProtobufDecoder::ProtobufDecoder(const uint8_t* data, const uint32_t size) : reader_(NULL) {
+ProtobufDecoder::ProtobufDecoder(const uint8_t* data, const uint32_t size): reader_(NULL) {
     reader_ = new protobuf::Reader();
     bool status = reader_->parse(data, size);
     assert(status);
@@ -15,8 +15,10 @@ ProtobufDecoder::~ProtobufDecoder() {
     }
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, int32_t& value, const protobuf::FieldType field_type) {
-    if (field_type == protobuf::FIELDTYPE_INT32 || field_type == protobuf::FIELDTYPE_BOOL || field_type == protobuf::FIELDTYPE_ENUM) {
+void ProtobufDecoder::readValue(const GenericNode& node, int32_t& value,
+                                const protobuf::FieldType field_type) {
+    if (field_type == protobuf::FIELDTYPE_INT32 || field_type == protobuf::FIELDTYPE_BOOL ||
+        field_type == protobuf::FIELDTYPE_ENUM) {
         value = (int32_t)node.u32;
     } else if (field_type == protobuf::FIELDTYPE_SFIXED32) {
         value = (int32_t)node.u32;
@@ -28,7 +30,8 @@ void ProtobufDecoder::readValue(const GenericNode& node, int32_t& value, const p
     }
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, int64_t& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, int64_t& value,
+                                const protobuf::FieldType field_type) {
     if (field_type == protobuf::FIELDTYPE_INT64) {
         value = (int64_t)node.u64;
     } else if (field_type == protobuf::FIELDTYPE_SFIXED64) {
@@ -41,7 +44,8 @@ void ProtobufDecoder::readValue(const GenericNode& node, int64_t& value, const p
     }
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, uint32_t& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, uint32_t& value,
+                                const protobuf::FieldType field_type) {
     if (field_type == protobuf::FIELDTYPE_UINT32) {
         value = node.u32;
     } else if (field_type == protobuf::FIELDTYPE_FIXED32) {
@@ -52,7 +56,8 @@ void ProtobufDecoder::readValue(const GenericNode& node, uint32_t& value, const 
     }
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, uint64_t& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, uint64_t& value,
+                                const protobuf::FieldType field_type) {
     if (field_type == protobuf::FIELDTYPE_UINT64) {
         value = node.u64;
     } else if (field_type == protobuf::FIELDTYPE_FIXED64) {
@@ -63,7 +68,8 @@ void ProtobufDecoder::readValue(const GenericNode& node, uint64_t& value, const 
     }
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, float& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, float& value,
+                                const protobuf::FieldType field_type) {
     assert(field_type == protobuf::FIELDTYPE_FIXED32);
     union {
         uint32_t u32;
@@ -73,7 +79,8 @@ void ProtobufDecoder::readValue(const GenericNode& node, float& value, const pro
     value = f;
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, double& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, double& value,
+                                const protobuf::FieldType field_type) {
     assert(field_type == protobuf::FIELDTYPE_FIXED64);
     union {
         uint64_t u64;
@@ -83,11 +90,11 @@ void ProtobufDecoder::readValue(const GenericNode& node, double& value, const pr
     value = db;
 }
 
-void ProtobufDecoder::readValue(const GenericNode& node, std::string& value, const protobuf::FieldType field_type) {
+void ProtobufDecoder::readValue(const GenericNode& node, std::string& value,
+                                const protobuf::FieldType field_type) {
     assert(field_type == protobuf::FIELDTYPE_BYTES || field_type == protobuf::FIELDTYPE_STRING);
     value.append((const char*)node.value, node.value_size);
 }
-
 
 const GenericNode* ProtobufDecoder::getNodeByNumber(const uint32_t field_number) const {
     if (!reader_) {

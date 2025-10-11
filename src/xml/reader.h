@@ -16,13 +16,13 @@ enum {
     NODE_DOCUMENT,//!< A document node. Name and value are empty.
     NODE_ELEMENT, //!< An element node. Name contains element name. Value contains text of first
     //!< data node.
-    NODE_DATA,    //!< A data node. Name is empty. Value contains data text.
-    NODE_CDATA,   //!< A CDATA node. Name is empty. Value contains data text.
-    NODE_COMMENT, //!< A comment node. Name is empty. Value contains comment text.
+    NODE_DATA,       //!< A data node. Name is empty. Value contains data text.
+    NODE_CDATA,      //!< A CDATA node. Name is empty. Value contains data text.
+    NODE_COMMENT,    //!< A comment node. Name is empty. Value contains comment text.
     NODE_DECLARATION,//!< A declaration node. Name and value are empty. Declaration parameters
     //!< (version, encoding and standalone) are in node attributes.
-    NODE_DOCTYPE,    //!< A DOCTYPE node. Name is empty. Value contains DOCTYPE text.
-    NODE_PI          //!< A PI node. Name contains target. Value contains instructions.
+    NODE_DOCTYPE,//!< A DOCTYPE node. Name is empty. Value contains DOCTYPE text.
+    NODE_PI      //!< A PI node. Name contains target. Value contains instructions.
 };
 
 class Reader {
@@ -72,7 +72,8 @@ private:
     static void skipBom(const char*& src);
 
     // skip
-    template <bool (*f)(const char)> static void skip(const char*& src) {
+    template <bool (*f)(const char)>
+    static void skip(const char*& src) {
         for (; f(*src);) {
             ++src;
         }

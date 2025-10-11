@@ -52,8 +52,7 @@ private:
     void setItemType(const int32_t type);
     void getChildItem(const uint32_t element_index);
     void setItemKey(const char* key, const uint32_t key_size);
-    void setItemValue(const int32_t type, const char* value,
-                      const uint32_t value_size);
+    void setItemValue(const int32_t type, const char* value, const uint32_t value_size);
 
     static bool consume(StringStream& is, const char expect);
     static void skipWhitespace(StringStream& is);

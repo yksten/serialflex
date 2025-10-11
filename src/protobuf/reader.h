@@ -14,7 +14,7 @@ namespace protobuf {
 class Reader {
     std::vector<GenericNode> nodes_;
     GenericNodeAllocator<GenericNode> alloc_;
-    std::vector<GenericNode*> numbers_; // protobuf use
+    std::vector<GenericNode*> numbers_;// protobuf use
     GenericNodeAllocator<GenericNode*> alloc_numbers_;
     std::string str_error_;
 

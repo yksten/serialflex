@@ -1,9 +1,9 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
+#include <cassert>
 #include <stdint.h>
 #include <vector>
-#include <cassert>
 
 namespace serialflex {
 
@@ -37,8 +37,7 @@ class GenericNodeAllocator {
     std::vector<T>& array_;
 
 public:
-    explicit GenericNodeAllocator(std::vector<T>& vec)
-        : cur_ndex_(0), capacity_(0), array_(vec) {}
+    explicit GenericNodeAllocator(std::vector<T>& vec): cur_ndex_(0), capacity_(0), array_(vec) {}
     void operator++() { ++capacity_; }
     void reSize() {
         assert(array_.empty());

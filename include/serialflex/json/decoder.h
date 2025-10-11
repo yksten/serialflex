@@ -2,8 +2,8 @@
 #define __JSON_DECODER_H__
 
 #include <map>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
+#include <serialflex/traits.h>
 
 namespace serialflex {
 

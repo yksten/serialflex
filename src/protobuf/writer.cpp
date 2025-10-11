@@ -14,7 +14,8 @@ void MessageByteSize::operator&(const Field<std::string>& value) {
 }
 
 uint32_t MessageByteSize::valueSize(const int32_t& value, const FieldType field_type) {
-    if (field_type == FIELDTYPE_INT32 || field_type == FIELDTYPE_BOOL || field_type == FIELDTYPE_ENUM) {
+    if (field_type == FIELDTYPE_INT32 || field_type == FIELDTYPE_BOOL ||
+        field_type == FIELDTYPE_ENUM) {
         return varintSize((uint32_t)value);
     } else if (field_type == FIELDTYPE_SFIXED32) {
         return 4;

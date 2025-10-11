@@ -22,8 +22,7 @@ class Writer {
     bool formatted_;
 
 public:
-    explicit Writer(std::string& str, bool formatted = false)
-        : str_(str), formatted_(formatted) {}
+    explicit Writer(std::string& str, bool formatted = false): str_(str), formatted_(formatted) {}
     // key and value
     Writer& key(const char* key);
     void value(bool b);

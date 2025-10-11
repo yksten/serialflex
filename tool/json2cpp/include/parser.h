@@ -12,12 +12,10 @@
 #define EXPORTAPI
 #endif
 
-
-
 namespace json2cpp {
 
-    EXPORTAPI std::string buildStruct(const char* json);
+EXPORTAPI std::string buildStruct(const char* json);
 
-}
+}// namespace json2cpp
 
 #endif

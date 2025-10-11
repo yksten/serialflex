@@ -189,8 +189,7 @@ void Reader::parseTrue(StringStream& is) {
     is.Take();
 
     if (consume(is, 'r') && consume(is, 'u') && consume(is, 'e')) {
-        setItemValue(VALUE_BOOL, szStart,
-                     (uint32_t)(is.Strart() - szStart));
+        setItemValue(VALUE_BOOL, szStart, (uint32_t)(is.Strart() - szStart));
     } else {
         setError("ValueInvalid");
     }
@@ -201,10 +200,8 @@ void Reader::parseFalse(StringStream& is) {
     const char* szStart = is.Strart();
     is.Take();
 
-    if (consume(is, 'a') && consume(is, 'l') && consume(is, 's') &&
-        consume(is, 'e')) {
-        setItemValue(VALUE_BOOL, szStart,
-                     (uint32_t)(is.Strart() - szStart));
+    if (consume(is, 'a') && consume(is, 'l') && consume(is, 's') && consume(is, 'e')) {
+        setItemValue(VALUE_BOOL, szStart, (uint32_t)(is.Strart() - szStart));
     } else {
         setError("ValueInvalid");
     }
@@ -217,8 +214,7 @@ void Reader::parseString(StringStream& is) {
 
     for (; is.Peek() != '\0'; is.Take()) {
         if (is.Peek() == '\"' && is.Second2Last() != '\\') {
-            setItemValue(VALUE_STRING, szStart,
-                         (uint32_t)(is.Strart() - szStart));
+            setItemValue(VALUE_STRING, szStart, (uint32_t)(is.Strart() - szStart));
             is.Take();// Skip '\"'
             return;
         }
@@ -230,12 +226,10 @@ void Reader::parseNumber(StringStream& is) {
     const char* szStart = is.Strart();
 
     for (; is.Peek() != '\0'; is.Take()) {
-        if (is.Peek() == '-' || is.Peek() == '.' ||
-            (is.Peek() >= '0' && is.Peek() <= '9')) {
+        if (is.Peek() == '-' || is.Peek() == '.' || (is.Peek() >= '0' && is.Peek() <= '9')) {
             continue;
         } else {
-            setItemValue(VALUE_NUMBER, szStart,
-                         (uint32_t)(is.Strart() - szStart));
+            setItemValue(VALUE_NUMBER, szStart, (uint32_t)(is.Strart() - szStart));
             return;
         }
     }
@@ -317,8 +311,7 @@ void Reader::parseObject(StringStream& is) {
 
 void Reader::setItemType(const int32_t type) {
     if (cur_value_) {
-        assert(VALUE_NULL <= type &&
-               type <= VALUE_OBJECT);
+        assert(VALUE_NULL <= type && type <= VALUE_OBJECT);
         cur_value_->type = type;
     }
 }
@@ -347,11 +340,9 @@ void Reader::setItemKey(const char* key, const uint32_t key_size) {
     }
 }
 
-void Reader::setItemValue(const int32_t type, const char* value,
-                          const uint32_t value_size) {
+void Reader::setItemValue(const int32_t type, const char* value, const uint32_t value_size) {
     if (cur_value_) {
-        assert(VALUE_NULL <= type &&
-               type <= VALUE_OBJECT);
+        assert(VALUE_NULL <= type && type <= VALUE_OBJECT);
         assert(value);
         assert(type == VALUE_STRING || value_size);
         cur_value_->type = type;

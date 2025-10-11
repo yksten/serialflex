@@ -161,6 +161,9 @@
                                      _8, _7, _6, _5, _4, _3, _2, _1))(c, __VA_ARGS__))
 
 #define VISITCLASS(class, ...)                                                                     \
-    template <typename T> void serialize(T& t, class& c) { NISERIALIZE(t, c, __VA_ARGS__); }
+    template <typename T>                                                                          \
+    void serialize(T& t, class& c) {                                                               \
+        NISERIALIZE(t, c, __VA_ARGS__);                                                            \
+    }
 
 #endif

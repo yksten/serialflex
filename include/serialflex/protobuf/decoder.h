@@ -2,8 +2,8 @@
 #define __PROTOBUF_DECODER_H__
 
 #include <map>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
+#include <serialflex/traits.h>
 
 namespace serialflex {
 
@@ -20,19 +20,20 @@ class EXPORTAPI ProtobufDecoder {
 public:
     ProtobufDecoder(const uint8_t* data, const uint32_t size);
     ~ProtobufDecoder();
-    
+
     template <typename T>
     bool operator>>(T& value) {
         internal::serializeWrapper(*this, value);
         return true;
     }
-    
+
     template <typename T>
     ProtobufDecoder& operator&(const Field<T>& field) {
         Field<T>& remove_const_field = *const_cast<Field<T>*>(&field);
         readField(remove_const_field);
         return *this;
     }
+
 public:
     template <typename T>
     void readField(Field<T>& field) {
@@ -58,9 +59,11 @@ public:
         }
         field.setHas(true);
         std::vector<T>& value = field.value();
+        value.clear();
         for (const GenericNode* cur_node = node; cur_node; cur_node = getNextNode(cur_node)) {
             T item = T();
-            readValue(*cur_node, *(typename internal::TypeTraits<T>::Type*)(&item), field.getType());
+            readValue(*cur_node, *(typename internal::TypeTraits<T>::Type*)(&item),
+                      field.getType());
             value.push_back(item);
         }
     }
@@ -74,6 +77,7 @@ public:
         }
         field.setHas(true);
         std::map<K, V>& value = field.getValue();
+        value.clear();
         for (const GenericNode* cur_node = node; cur_node; cur_node = getNextNode(cur_node)) {
             ProtobufDecoder decoder(getData(cur_node), getDataSize(cur_node));
             const GenericNode* first_node = decoder.getNodeByNumber(1);
@@ -84,11 +88,14 @@ public:
             }
             K key = K();
             V item = V();
-            readValue(*first_node, *(typename internal::TypeTraits<K>::Type*)(&key), field.getType());
-            readValue(*second_node, *(typename internal::TypeTraits<V>::Type*)(&item), field.getType2());
+            readValue(*first_node, *(typename internal::TypeTraits<K>::Type*)(&key),
+                      field.getType());
+            readValue(*second_node, *(typename internal::TypeTraits<V>::Type*)(&item),
+                      field.getType2());
             value.insert(std::pair<K, V>(key, item));
         }
     }
+
 private:
     template <typename T>
     void readValue(const GenericNode& node, T& value, const protobuf::FieldType field_type) {
@@ -102,8 +109,9 @@ private:
     void readValue(const GenericNode& node, uint64_t& value, const protobuf::FieldType field_type);
     void readValue(const GenericNode& node, float& value, const protobuf::FieldType field_type);
     void readValue(const GenericNode& node, double& value, const protobuf::FieldType field_type);
-    void readValue(const GenericNode& node, std::string& value, const protobuf::FieldType field_type);
-    
+    void readValue(const GenericNode& node, std::string& value,
+                   const protobuf::FieldType field_type);
+
     const GenericNode* getNodeByNumber(const uint32_t field_number) const;
     protobuf::WireType getWireType(const GenericNode* node);
     static const GenericNode* getNextNode(const GenericNode* node);

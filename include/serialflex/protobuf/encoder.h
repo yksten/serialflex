@@ -2,10 +2,9 @@
 #define __PROTOBUF_ENCODER_H__
 
 #include <map>
-#include <serialflex/traits.h>
 #include <serialflex/field.h>
 #include <serialflex/protobuf/writer.h>
-
+#include <serialflex/traits.h>
 
 namespace serialflex {
 
@@ -27,7 +26,7 @@ public:
                                    *const_cast<typename internal::TypeTraits<T>::Type*>(&value));
         return (!str_.empty());
     }
-    
+
     template <typename T>
     ProtobufEncoder& operator&(const Field<T>& field) {
         if (field.getHas() && field.getNumber() != 0) {
@@ -59,7 +58,7 @@ private:
         if (field.getPacked()) {
             // tag - length - value - value ......
             writeTag(field_number, protobuf::WIRETYPE_LENGTH_DELIMITED);// tag
-        
+
             uint64_t length = 0;
             for (uint32_t idx = 0; idx < size; ++idx) {
                 const typename internal::TypeTraits<T>::Type& item = value.at(idx);
@@ -67,7 +66,7 @@ private:
                     protobuf::MessageByteSize::valueSize(item, field_type));
             }
             writeVarint(length);// length
-        
+
             for (uint32_t idx = 0; idx < size; ++idx) {
                 const typename internal::TypeTraits<T>::Type& item = value.at(idx);
                 writeValue(item, field_type);// value
@@ -102,7 +101,8 @@ private:
             length += 1;// field number is 1(one byte)
             const uint64_t key_length = protobuf::MessageByteSize::valueSize(
                 *((const typename internal::TypeTraits<K>::Type*)(&it->first)), field_type);
-            if (field_type == protobuf::FIELDTYPE_STRING || field_type == protobuf::FIELDTYPE_MESSAGE ||
+            if (field_type == protobuf::FIELDTYPE_STRING ||
+                field_type == protobuf::FIELDTYPE_MESSAGE ||
                 field_type == protobuf::FIELDTYPE_BYTES) {
                 length += protobuf::MessageByteSize::varintSize(key_length);// length key
             }
@@ -111,7 +111,8 @@ private:
             length += 1;// field number is 2(one byte)
             const uint64_t value_length = protobuf::MessageByteSize::valueSize(
                 *((const typename internal::TypeTraits<V>::Type*)(&it->second)), field.getType2());
-            if (field_type2 == protobuf::FIELDTYPE_STRING || field_type2 == protobuf::FIELDTYPE_MESSAGE ||
+            if (field_type2 == protobuf::FIELDTYPE_STRING ||
+                field_type2 == protobuf::FIELDTYPE_MESSAGE ||
                 field_type2 == protobuf::FIELDTYPE_BYTES) {
                 length += protobuf::MessageByteSize::varintSize(value_length);// length value
             }

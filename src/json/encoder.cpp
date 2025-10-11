@@ -57,8 +57,7 @@ void JSONEncoder::encodeValue(const char* name, const std::string& value) {
     }
 }
 
-void JSONEncoder::encodeValue(const char* name,
-                              const std::vector<bool>& value) {
+void JSONEncoder::encodeValue(const char* name, const std::vector<bool>& value) {
     startArray(name);
     int32_t size = (int32_t)value.size();
     for (int32_t i = 0; i < size; ++i) {
