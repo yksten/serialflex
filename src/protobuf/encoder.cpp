@@ -29,7 +29,7 @@ void ProtobufEncoder::writeValue(const int64_t& value, const protobuf::FieldType
     if (field_type == protobuf::FIELDTYPE_INT64) {
         writeVarint((uint32_t)value);
     } else if (field_type == protobuf::FIELDTYPE_SFIXED64) {
-        writeFixed32(*reinterpret_cast<const uint32_t*>(&value));
+        writeFixed64(*reinterpret_cast<const uint64_t*>(&value));
     } else if (field_type == protobuf::FIELDTYPE_SINT64) {
         writeVarint(protobuf::MessageByteSize::zigZagEncode(value));
     } else {
