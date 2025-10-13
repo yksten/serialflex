@@ -61,12 +61,22 @@ void ProtobufEncoder::writeValue(const uint64_t& value, const protobuf::FieldTyp
 
 void ProtobufEncoder::writeValue(const float& value, const protobuf::FieldType field_type) {
     assert(field_type == protobuf::FIELDTYPE_FIXED32);
-    writeFixed32(*reinterpret_cast<const uint32_t*>(&value));
+    union {
+        uint32_t u32;
+        float f;
+    };
+    f = value;
+    writeFixed32(u32);
 }
 
 void ProtobufEncoder::writeValue(const double& value, const protobuf::FieldType field_type) {
     assert(field_type == protobuf::FIELDTYPE_FIXED64);
-    writeFixed64(*reinterpret_cast<const uint64_t*>(&value));
+    union {
+        uint64_t u64;
+        double db;
+    };
+    db = value;
+    writeFixed64(u64);
 }
 
 void ProtobufEncoder::writeValue(const std::string& value, const protobuf::FieldType field_type) {
