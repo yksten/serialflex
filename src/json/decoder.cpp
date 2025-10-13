@@ -116,8 +116,8 @@ static bool parse_string(std::string& strValue, const char* str, uint32_t length
     return true;
 }
 
-JSONDecoder::JSONDecoder(const char* str, bool caseInsensitive)
-    : convert_by_type_(true), case_insensitive_(caseInsensitive), current_(NULL) {
+JSONDecoder::JSONDecoder(const char* str, bool case_insensitive)
+    : convert_by_type_(true), case_insensitive_(case_insensitive), current_(NULL) {
     reader_ = new json::Reader();
     current_ = reader_->parse(str);
     assert(current_);
@@ -128,6 +128,13 @@ JSONDecoder::~JSONDecoder() { delete reader_; }
 JSONDecoder& JSONDecoder::setConvertByType(bool convert_by_type) {
     convert_by_type_ = convert_by_type;
     return *this;
+}
+
+const char* JSONDecoder::getError() const {
+    if (!reader_) {
+        return "reader is null";
+    }
+    return reader_->getError();
 }
 
 void JSONDecoder::decodeValue(const char* name, bool& value, bool* has_value) {
@@ -270,14 +277,14 @@ static int32_t strcasecmp(const char* s1, const char* s2) {
 }
 
 const GenericNode* JSONDecoder::getObjectItem(const GenericNode* parent, const char* name,
-                                              bool caseInsensitive) {
+                                              bool case_insensitive) {
     if (!parent || !name) {
         return parent;
     }
 
     for (GenericNode* child = parent->child; child; child = child->next) {
         if (child->key && (strlen(name) == child->key_size)) {
-            if (!caseInsensitive) {
+            if (!case_insensitive) {
                 if (strncmp(name, child->key, child->key_size) == 0) {
                     return child;
                 }

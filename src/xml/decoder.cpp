@@ -16,6 +16,13 @@ XMLDecoder::~XMLDecoder() {
     }
 }
 
+const char* XMLDecoder::getError() const {
+    if (!reader_) {
+        return "reader is null";
+    }
+    return reader_->getError();
+}
+
 XMLDecoder& XMLDecoder::setConvertByType(bool convert_by_type) {
     convert_by_type_ = convert_by_type;
     return *this;
@@ -155,14 +162,14 @@ static int32_t strcasecmp(const char* s1, const char* s2) {
 }
 
 const GenericNode* XMLDecoder::getObjectItem(const GenericNode* parent, const char* name,
-                                             bool caseInsensitive) {
+                                             bool case_insensitive) {
     if (!parent || !name) {
         return parent;
     }
 
     for (GenericNode* child = parent->child; child; child = child->next) {
         if (child->key && (strlen(name) == child->key_size)) {
-            if (!caseInsensitive) {
+            if (!case_insensitive) {
                 if (strncmp(name, child->key, child->key_size) == 0) {
                     return child;
                 }

@@ -15,6 +15,13 @@ ProtobufDecoder::~ProtobufDecoder() {
     }
 }
 
+const char* ProtobufDecoder::getError() const {
+    if (!reader_) {
+        return "reader is null";
+    }
+    return reader_->getError();
+}
+
 void ProtobufDecoder::readValue(const GenericNode& node, int32_t& value,
                                 const protobuf::FieldType field_type) {
     if (field_type == protobuf::FIELDTYPE_INT32 || field_type == protobuf::FIELDTYPE_BOOL ||

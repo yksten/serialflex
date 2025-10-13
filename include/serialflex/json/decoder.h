@@ -22,11 +22,13 @@ class EXPORTAPI JSONDecoder {
     JSONDecoder& operator=(const JSONDecoder&);
 
 public:
-    JSONDecoder(const char* str, bool caseInsensitive = false);
+    JSONDecoder(const char* str, bool case_insensitive = false);
     ~JSONDecoder();
 
     // convert by field type
     JSONDecoder& setConvertByType(bool convert_by_type);
+    
+    const char* getError() const;
 
     template <typename T>
     JSONDecoder& operator&(const Field<T>& field) {
@@ -47,7 +49,14 @@ public:
         }
         const GenericNode* parent = current_;
         internal::serializeWrapper(*this, value);
-        return (parent == current_);
+
+        if (parent != current_) {
+            return false;
+        }
+        if (getError()) {
+            return false;
+        }
+        return true;
     }
 
     template <typename T>
@@ -67,7 +76,14 @@ public:
             decodeValue(NULL, *(typename internal::TypeTraits<T>::Type*)(&value.at(idx)), NULL);
         }
         current_ = parent_temp;
-        return (parent == current_);
+
+        if (parent != current_) {
+            return false;
+        }
+        if (getError()) {
+            return false;
+        }
+        return true;
     }
 
     template <typename K, typename V>
@@ -162,7 +178,7 @@ private:
     // for value
     static uint32_t getObjectSize(const GenericNode* parent);
     static const GenericNode* getObjectItem(const GenericNode* parent, const char* name,
-                                            bool caseInsensitive);
+                                            bool case_insensitive);
     static const GenericNode* getChild(const GenericNode* parent);
     static const GenericNode* getNext(const GenericNode* parent);
     static const char* getKey(const GenericNode* parent);

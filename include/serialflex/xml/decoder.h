@@ -24,6 +24,8 @@ class EXPORTAPI XMLDecoder {
 public:
     XMLDecoder(const char* str, bool case_insensitive = false);
     ~XMLDecoder();
+    
+    const char* getError() const;
 
     // convert by field type
     XMLDecoder& setConvertByType(bool convert_by_type);
@@ -47,7 +49,14 @@ public:
         }
         const GenericNode* parent = current_;
         internal::serializeWrapper(*this, value);
-        return (parent == current_);
+
+        if (parent != current_) {
+            return false;
+        }
+        if (getError()) {
+            return false;
+        }
+        return true;
     }
 
     template <typename T>
@@ -69,7 +78,14 @@ public:
             value.push_back(item);
         }
         current_ = parent_temp;
-        return (parent == current_);
+
+        if (parent != current_) {
+            return false;
+        }
+        if (getError()) {
+            return false;
+        }
+        return true;
     }
 
     template <typename K, typename V>
@@ -89,7 +105,14 @@ public:
             value.insert(std::pair<K, V>(key, item));
         }
         current_ = parent_temp;
-        return (parent == current_);
+
+        if (parent != current_) {
+            return false;
+        }
+        if (getError()) {
+            return false;
+        }
+        return true;
     }
 
 private:
@@ -167,7 +190,7 @@ private:
     // for value
     static uint32_t getObjectSize(const GenericNode* parent);
     static const GenericNode* getObjectItem(const GenericNode* parent, const char* name,
-                                            bool caseInsensitive);
+                                            bool case_insensitive);
     static const GenericNode* getChild(const GenericNode* parent);
     static const GenericNode* getNext(const GenericNode* parent);
 

@@ -20,10 +20,15 @@ class EXPORTAPI ProtobufDecoder {
 public:
     ProtobufDecoder(const uint8_t* data, const uint32_t size);
     ~ProtobufDecoder();
+    
+    const char* getError() const;
 
     template <typename T>
     bool operator>>(T& value) {
         internal::serializeWrapper(*this, value);
+        if (getError()) {
+            return false;
+        }
         return true;
     }
 
