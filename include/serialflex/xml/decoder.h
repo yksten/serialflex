@@ -72,7 +72,7 @@ public:
         const GenericNode* parent_temp = current_;
         current_ = XMLDecoder::getChild(current_);
         value.clear();
-        for (uint32_t idx = 0; current_; (current_ = XMLDecoder::getNext(current_)) && ++idx) {
+        for (uint32_t idx = 0; current_; (current_ = XMLDecoder::getNext(current_)), ++idx) {
             T item = T();
             decodeValue("value", *(typename internal::TypeTraits<T>::Type*)(&item), NULL);
             value.push_back(item);
@@ -139,7 +139,7 @@ private:
             // }
             const GenericNode* parent_temp = current_;
             current_ = XMLDecoder::getChild(current_);
-            for (uint32_t idx = 0; current_; (current_ = XMLDecoder::getNext(current_)) && ++idx) {
+            for (uint32_t idx = 0; current_; (current_ = XMLDecoder::getNext(current_)), ++idx) {
                 T item = T();
                 decodeValue(NULL, *(typename internal::TypeTraits<T>::Type*)(&item), NULL);
                 value.push_back(item);
