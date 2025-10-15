@@ -46,7 +46,6 @@ private:
                            const FieldDescriptorArr& messages) const;
     void printGetSetHas(google::protobuf::io::Printer& printer,
                         const FieldDescriptorArr& messages) const;
-    void printInitField(google::protobuf::io::Printer& printer, const FieldDescriptor& field) const;
     void printInitFields(google::protobuf::io::Printer& printer,
                          const FieldDescriptorArr& messages) const;
     void printSerialize(google::protobuf::io::Printer& printer,

@@ -36,27 +36,29 @@ hash_set<string> MakeKeywordsMap() {
 
 hash_set<string> kKeywords = MakeKeywordsMap();
 
-std::string type2string(const FieldDescriptor& field, const char* sz = "") {
+std::string type2string(const FieldDescriptor& field) {
     switch (field.type()) {
         case FieldDescriptor::TYPE_DOUBLE:
             return "double";
         case FieldDescriptor::TYPE_FLOAT:
             return "float";
         case FieldDescriptor::TYPE_INT64:
-        case FieldDescriptor::TYPE_UINT64:
-        case FieldDescriptor::TYPE_FIXED64:
         case FieldDescriptor::TYPE_SFIXED64:
         case FieldDescriptor::TYPE_SINT64:
             return "int64_t";
+        case FieldDescriptor::TYPE_UINT64:
+        case FieldDescriptor::TYPE_FIXED64:
+            return "uint64_t";
         case FieldDescriptor::TYPE_INT32:
-        case FieldDescriptor::TYPE_FIXED32:
-        case FieldDescriptor::TYPE_UINT32:
         case FieldDescriptor::TYPE_SFIXED32:
         case FieldDescriptor::TYPE_SINT32:
             return "int32_t";
+        case FieldDescriptor::TYPE_FIXED32:
+        case FieldDescriptor::TYPE_UINT32:
+            return "uint32_t";
         case FieldDescriptor::TYPE_ENUM: {
             std::string result;
-            result = sz + ClassName(field.enum_type(), true);
+            result = ClassName(field.enum_type(), true);
             return result;
         }
         case FieldDescriptor::TYPE_BOOL:
@@ -66,7 +68,7 @@ std::string type2string(const FieldDescriptor& field, const char* sz = "") {
             return "std::string";
         default: {
             std::string result;
-            result = sz + ClassName(field.message_type(), true);
+            result = ClassName(field.message_type(), true);
             return result;
         }
     }
@@ -126,14 +128,6 @@ std::string type2value(const FieldDescriptor& field) {
 }
 
 const char* getFieldType(const FieldDescriptor& field) {
-    if (field.is_map()) {
-        const FieldDescriptor* key = field.message_type()->field(0);
-        if (key) {
-            return getFieldType(*key);
-        }
-        assert(false);
-        return "error";
-    }
     switch (field.type()) {
         case FieldDescriptor::TYPE_DOUBLE:
             return "serialflex::protobuf::FIELDTYPE_DOUBLE";
@@ -172,24 +166,11 @@ const char* getFieldType(const FieldDescriptor& field) {
         case FieldDescriptor::TYPE_SINT64:
             return "serialflex::protobuf::FIELDTYPE_SINT64";
         default:
+            assert(false);
             return NULL;
     }
 }
 
-std::string type2tag(const FieldDescriptor& field) {
-    std::string str_result;
-
-    if (field.is_packed()) {
-        str_result.append(", true");
-    } else if (field.is_map()) {
-        const FieldDescriptor* value = field.message_type()->field(1);
-        if (value) {
-            str_result.append(", ").append(getFieldType(*value));
-        }
-    }
-
-    return str_result;
-}
 /*--------------------------------------------------------------------------------*/
 class PackagePartsWrapper {
     const std::vector<string>& _package_parts;
@@ -379,7 +360,7 @@ void CodeSerialize::printDeclare(google::protobuf::io::Printer& printer,
             if (field->is_map()) {
                 printer.Print("    std::map<$type$>", "type", map2string(*field));
             } else if (field->is_repeated()) {
-                printer.Print("    std::vector<$type$>", "type", type2string(*field, " "));
+                printer.Print("    std::vector<$type$>", "type", type2string(*field));
             } else {
                 printer.Print("    $type$", "type", type2string(*field));
             }
@@ -410,7 +391,7 @@ void CodeSerialize::printGetSetHas(google::protobuf::io::Printer& printer,
             if (field->is_map()) {
                 field_type.append("std::map<").append(map2string(*field)).append(">");
             } else if (field->is_repeated()) {
-                field_type.append("std::vector<").append(type2string(*field, " ")).append(">");
+                field_type.append("std::vector<").append(type2string(*field)).append(">");
             } else {
                 field_type.append(type2string(*field));
             }
@@ -443,34 +424,27 @@ void CodeSerialize::printGetSetHas(google::protobuf::io::Printer& printer,
     printer.Print("\n");
 }
 
-void CodeSerialize::printInitField(google::protobuf::io::Printer& printer,
-                                   const FieldDescriptor& field) const {
-    printer.Print("$fieldName$_(", "fieldName", FieldName(field));
-    if (field.has_default_value()) {
-        printer.Print("$value$", "value", type2value(field));
-    }
-    printer.Print(")");
-    if (!field.is_map() && !field.is_repeated()) {
-        printer.Print(", has_$fieldName$_(false)", "fieldName", FieldName(field));
-    }
-}
-
 void CodeSerialize::printInitFields(google::protobuf::io::Printer& printer,
                                     const FieldDescriptorArr& messages) const {
     uint32_t message_size = (uint32_t)messages._vec.size();
+    std::string delimiter(":");
     for (uint32_t idx = 0, flag = 0; idx < message_size; ++idx) {
         if (const FieldDescriptor* field = messages._vec.at(idx)) {
-            bool init = (!field->is_map() && !field->is_repeated() &&
-                         field->type() != FieldDescriptor::TYPE_STRING &&
-                         field->type() != FieldDescriptor::TYPE_MESSAGE);
-            if (init) {
-                if (!flag) {
-                    printer.Print(" : ");
-                } else {
-                    printer.Print(", ");
+            if ((!field->is_map() && !field->is_repeated() &&
+                 field->type() != FieldDescriptor::TYPE_STRING &&
+                 field->type() != FieldDescriptor::TYPE_MESSAGE)) {
+                printer.Print(" $delimiter$ ", "delimiter", delimiter);
+                delimiter = ",";
+                printer.Print("$fieldName$_(", "fieldName", FieldName(*field));
+                if (field->has_default_value()) {
+                    printer.Print("$value$", "value", type2value(*field));
                 }
-                printInitField(printer, *field);
-                flag = 1;
+                printer.Print(")");
+            }
+
+            if (!field->is_map() && !field->is_repeated()) {
+                printer.Print("$delimiter$ has_$fieldName$_(false)", "delimiter", delimiter,
+                              "fieldName", FieldName(*field));
             }
         }
     }
@@ -489,14 +463,24 @@ void CodeSerialize::printSerialize(google::protobuf::io::Printer& printer,
             snprintf(sz, 20, "%d", field->number());
             const std::string& strOrgName = field->name();
             std::string fieldName(FieldName(*field));
-            printer.Print(" & MAKE_FIELD(\"$name$\", $number$, $type$, $field$_", "name", fieldName,
-                          "number", sz, "type", getFieldType(*field), "field", fieldName);
-            if (!field->is_map() && !field->is_repeated()) {
-                char has_field[128] = {0};
-                snprintf(has_field, 128, "&has_%s_", fieldName.c_str());
-                printer.Print(", $has$$tag$", "has", has_field, "tag", type2tag(*field));
+            if (field->is_map()) {
+                printer.Print(
+                    " & MAKE_FIELD(\"$name$\", $number$, $type$, $field$_, NULL, $type2$)", "name",
+                    fieldName, "number", sz, "type", getFieldType(*field->message_type()->field(0)),
+                    "field", fieldName, "type2", getFieldType(*field->message_type()->field(1)));
+            } else if (field->is_repeated()) {
+                printer.Print(" & MAKE_FIELD(\"$name$\", $number$, $type$, $field$_, NULL", "name",
+                              fieldName, "number", sz, "type", getFieldType(*field), "field",
+                              fieldName);
+                if (field->is_packed()) {
+                    printer.Print(", true");
+                }
+                printer.Print(")");
+            } else {
+                printer.Print(" & MAKE_FIELD(\"$name$\", $number$, $type$, $field$_, &has_$name$_)",
+                              "name", fieldName, "number", sz, "type", getFieldType(*field),
+                              "field", fieldName);
             }
-            printer.Print(")");
         }
     }
     printer.Print(";\n    }\n");
