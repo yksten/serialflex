@@ -20,7 +20,7 @@ class EXPORTAPI ProtobufDecoder {
 public:
     ProtobufDecoder(const uint8_t* data, const uint32_t size);
     ~ProtobufDecoder();
-    
+
     const char* getError() const;
 
     template <typename T>
@@ -35,7 +35,7 @@ public:
     template <typename T>
     ProtobufDecoder& operator&(const Field<T>& field) {
         Field<T>& remove_const_field = *const_cast<Field<T>*>(&field);
-        readField(remove_const_field);
+        readField(*(Field<typename internal::TypeTraits<T>::Type>*)(&remove_const_field));
         return *this;
     }
 
@@ -81,7 +81,7 @@ public:
             return;
         }
         field.setHas(true);
-        std::map<K, V>& value = field.getValue();
+        std::map<K, V>& value = field.value();
         value.clear();
         for (const GenericNode* cur_node = node; cur_node; cur_node = getNextNode(cur_node)) {
             ProtobufDecoder decoder(getData(cur_node), getDataSize(cur_node));

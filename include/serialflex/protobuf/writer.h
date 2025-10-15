@@ -15,13 +15,14 @@ class EXPORTAPI MessageByteSize {
 public:
     explicit MessageByteSize(uint32_t& size): size_(size) {}
 
-    void operator&(const Field<std::string>& value);
+    MessageByteSize& operator&(const Field<std::string>& field);
 
     template <typename T>
-    void operator&(const Field<T>& field) {
+    MessageByteSize& operator&(const Field<T>& field) {
         if (field.getHas() && field.getNumber() != 0) {
             fieldSize(*(const Field<typename internal::TypeTraits<T>::Type>*)(&field));
         }
+        return *this;
     }
 
     template <typename T>
@@ -29,7 +30,8 @@ public:
         assert(field_type == FIELDTYPE_MESSAGE);
         uint32_t size = 0;
         MessageByteSize mb(size);
-        internal::serializeWrapper(mb, value);
+        internal::serializeWrapper(mb,
+                                   *const_cast<typename internal::TypeTraits<T>::Type*>(&value));
         return size;
     }
     static uint32_t valueSize(const int32_t& value, const FieldType field_type);
@@ -121,7 +123,7 @@ private:
             length += key_length;
 
             length += 1;// field number is 2(one byte)
-            const uint64_t value_length = valueSize(second, value.getType2());
+            const uint64_t value_length = valueSize(second, field.getType2());
             if (field_type2 == FIELDTYPE_STRING || field_type2 == FIELDTYPE_MESSAGE ||
                 field_type2 == FIELDTYPE_BYTES) {
                 length += varintSize(value_length);// length value

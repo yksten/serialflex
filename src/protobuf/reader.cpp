@@ -150,9 +150,11 @@ bool Reader::parseFromBytes(const uint8_t* bytes, const uint32_t size) {
                 wrapper.addField(field_number, (WireType)wire_type, value, data, pos - remaining);
             } break;
             case WIRETYPE_LENGTH_DELIMITED: {
-                const uint64_t size = readVarInt(current, remaining);
+                const uint64_t data_size = readVarInt(current, remaining);
                 const uint8_t* data = current;
-                wrapper.addField(field_number, (WireType)wire_type, data, size);
+                wrapper.addField(field_number, (WireType)wire_type, data, data_size);
+                current += data_size;
+                remaining -= data_size;
             } break;
             case WIRETYPE_START_GROUP: {
                 // setError("GROUPSTART Unhandled wire type encountered");

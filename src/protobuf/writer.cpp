@@ -4,13 +4,12 @@ namespace serialflex {
 
 namespace protobuf {
 
-void MessageByteSize::operator&(const Field<std::string>& value) {
-    const std::string& str = value.getValue();
-    if (str.empty()) {
-        return;
+MessageByteSize& MessageByteSize::operator&(const Field<std::string>& field) {
+    if (field.getHas() && field.getNumber() != 0 && !field.getValue().empty()) {
+        // tag - length - value
+        fieldSize(field);
     }
-    // tag - length - value
-    fieldSize(value);
+    return *this;
 }
 
 uint32_t MessageByteSize::valueSize(const int32_t& value, const FieldType field_type) {

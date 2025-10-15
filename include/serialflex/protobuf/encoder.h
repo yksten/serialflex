@@ -41,7 +41,7 @@ private:
     template <typename T>
     void writeField(const Field<T>& field) {
         // message : tag - length - value
-        writeTag(field.getNumber(), field.getWrieType());
+        writeTag(field.getNumber(), field.getWireType());
         writeValue(field.getValue(), field.getType());
     }
 
@@ -121,9 +121,9 @@ private:
             writeVarint(length);
 
             // 3.value
-            writeTag(1, field.getWrieType());
+            writeTag(1, field.getWireType());
             writeValue(it->first, field_type);
-            writeTag(2, field.getWrieType2());
+            writeTag(2, field.getWireType2());
             writeValue(it->second, field_type2);
         }
     }
@@ -134,7 +134,8 @@ private:
 
         uint32_t size = 0;
         protobuf::MessageByteSize mb(size);
-        internal::serializeWrapper(mb, value);
+        internal::serializeWrapper(mb,
+                                   *const_cast<typename internal::TypeTraits<T>::Type*>(&value));
 
         writeVarint(size);             // length
         ProtobufEncoder(str_) << value;// value
