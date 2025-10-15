@@ -118,18 +118,15 @@ struct is_enum {
 template <typename T, bool is_enum = is_enum<T>::value>
 struct TypeTraits {
     typedef T Type;
-    static const int32_t a = 1;
 };
 #endif
 template <typename T, bool is_enum>
 struct TypeTraits<std::vector<T>, is_enum> {
     typedef std::vector<T> Type;
-    static const int32_t a = 2;
 };
 template <typename T>
 struct TypeTraits<T, true> {
     typedef int32_t Type;
-    static const int32_t a = 3;
 };
 
 namespace STOT {
