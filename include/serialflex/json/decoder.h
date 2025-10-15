@@ -72,7 +72,7 @@ public:
         const GenericNode* parent_temp = current_;
         current_ = JSONDecoder::getChild(current_);
         for (uint32_t idx = 0; current_ && (idx < size);
-             (current_ = JSONDecoder::getNext(current_)) && ++idx) {
+             (current_ = JSONDecoder::getNext(current_)), ++idx) {
             decodeValue(NULL, *(typename internal::TypeTraits<T>::Type*)(&value.at(idx)), NULL);
         }
         current_ = parent_temp;
@@ -129,7 +129,7 @@ private:
             const GenericNode* parent_temp = current_;
             current_ = JSONDecoder::getChild(current_);
             for (uint32_t idx = 0; current_ && (idx < size);
-                 (current_ = JSONDecoder::getNext(current_)) && ++idx) {
+                 (current_ = JSONDecoder::getNext(current_)), ++idx) {
                 decodeValue(NULL, *(typename internal::TypeTraits<T>::Type*)(&value.at(idx)), NULL);
             }
             current_ = parent_temp;
