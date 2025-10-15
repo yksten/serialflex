@@ -26,7 +26,6 @@ public:
     template <typename T>
     JSONEncoder& convert(const char* name, const T& value, const bool* has_value = NULL) {
         if (!has_value || (*has_value == true)) {
-            int a = internal::TypeTraits<T>::a;
             encodeValue(name, *(const typename internal::TypeTraits<T>::Type*)(&value));
         }
         return *this;
