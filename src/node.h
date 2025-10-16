@@ -9,18 +9,18 @@ namespace serialflex {
 
 struct GenericNode {
     GenericNode()
-        : type(-1), key(NULL), key_size(0), value(NULL), value_size(0), prev(NULL), next(NULL),
-          child(NULL), number(0), u64(0) {}
+        : type(-1), key(NULL), key_size(0), value(NULL), value_size(0), u64(0), prev(NULL), 
+          next(NULL), child(NULL), number(0) {}
 
     int32_t type;
     const char* key;
     uint32_t key_size;
+    const char* value;
+    uint32_t value_size;
     union {
         uint64_t u64;
         uint32_t u32;
     };
-    const char* value;
-    uint32_t value_size;
 
     GenericNode* prev;
     GenericNode* next;
