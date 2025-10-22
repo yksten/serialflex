@@ -432,8 +432,9 @@ void CodeSerialize::printInitFields(google::protobuf::io::Printer& printer,
         if (const FieldDescriptor* field = messages._vec.at(idx)) {
             if ((!field->is_map() && !field->is_repeated() &&
                  field->type() != FieldDescriptor::TYPE_STRING &&
+                 field->type() != FieldDescriptor::TYPE_BYTES &&
                  field->type() != FieldDescriptor::TYPE_MESSAGE)) {
-                printer.Print(" $delimiter$ ", "delimiter", delimiter);
+                printer.Print("$delimiter$ ", "delimiter", delimiter);
                 delimiter = ",";
                 printer.Print("$fieldName$_(", "fieldName", FieldName(*field));
                 if (field->has_default_value()) {
@@ -445,6 +446,7 @@ void CodeSerialize::printInitFields(google::protobuf::io::Printer& printer,
             if (!field->is_map() && !field->is_repeated()) {
                 printer.Print("$delimiter$ has_$fieldName$_(false)", "delimiter", delimiter,
                               "fieldName", FieldName(*field));
+                delimiter = ",";
             }
         }
     }
